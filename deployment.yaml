@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring-app-backend
+  name: backend-app-deployment
 spec:
   replicas: 1
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: sekarfeb/backend-spring-app:latest
+          image: sekarfeb/backend-employee-app:latest
           ports:
             - containerPort: 8080
 ---
@@ -23,7 +23,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-service
+  name: backend-app-service
 spec:
   selector:
     app: backend-app 
@@ -31,5 +31,5 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-  type: NodePort # Use the appropriate service type for your environment
+
 
