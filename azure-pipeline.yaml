@@ -1,0 +1,44 @@
+name: $(date:yyyyMMdd)$(rev:.r)
+resources:
+  repositories:
+  - repository: self
+    type: git
+    ref: refs/heads/main
+jobs:
+- job: Job_1
+  displayName: Agent job 1
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - checkout: self
+    clean: true
+    fetchTags: false
+  - task: Docker@0
+    displayName: Build an image
+    inputs:
+      containerregistrytype: Container Registry
+      dockerRegistryEndpoint: 7380a2a8-bf5d-485c-9af6-8294b8bd8b0a
+      azureSubscriptionEndpoint: def19b14-8bd4-40fc-9224-06ee622a4348
+      imageName: $(Build.Repository.Name):latest
+  - task: Docker@0
+    displayName: Push an image
+    inputs:
+      containerregistrytype: Container Registry
+      dockerRegistryEndpoint: 7380a2a8-bf5d-485c-9af6-8294b8bd8b0a
+      action: Push an image
+      imageName: $(Build.Repository.Name):latest
+  - task: Kubernetes@1
+    displayName: kubectl apply
+    inputs:
+      kubernetesServiceEndpoint: 13c3a89a-8c2d-4abf-90c3-83d0bc164caa
+      command: apply
+      useConfigurationFile: true
+      configuration: deployment.yaml
+  - task: KubernetesCLI@1
+    displayName: kubectl port-forward
+    inputs:
+      kubernetesServiceEndpoint: 13c3a89a-8c2d-4abf-90c3-83d0bc164caa
+      command: port-forward
+      arguments: service/backend-app-service 8084:8080
+
+...
